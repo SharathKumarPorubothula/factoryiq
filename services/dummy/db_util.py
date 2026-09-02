@@ -1,4 +1,5 @@
 import os
+
 import psycopg2
 from psycopg2 import pool
 
@@ -9,73 +10,44 @@ logger = get_logger(__name__)
 
 
 class Database:
-
     def __init__(self):
 
         # ====================================================
         # Service
         # ====================================================
 
-        self.service_name = os.getenv(
-            "SERVICE_NAME"
-        )
+        self.service_name = os.getenv("SERVICE_NAME")
 
         if not self.service_name:
-            raise RuntimeError(
-                "SERVICE_NAME is not configured"
-            )
+            raise RuntimeError("SERVICE_NAME is not configured")
 
         # ====================================================
         # PostgreSQL Configuration
         # ====================================================
 
-        self.host = os.getenv(
-            "DB_HOST",
-            "postgres"
-        )
+        self.host = os.getenv("DB_HOST", "postgres")
 
-        self.port = int(
-            os.getenv(
-                "DB_PORT",
-                "5432"
-            )
-        )
+        self.port = int(os.getenv("DB_PORT", "5432"))
 
-        self.user = os.getenv(
-            "DB_USER"
-        )
+        self.user = os.getenv("DB_USER")
 
-        self.password = os.getenv(
-            "DB_PASSWORD"
-        )
+        self.password = os.getenv("DB_PASSWORD")
 
         if not self.user:
-            raise RuntimeError(
-                "DB_USER is not configured"
-            )
+            raise RuntimeError("DB_USER is not configured")
 
         if not self.password:
-            raise RuntimeError(
-                "DB_PASSWORD is not configured"
-            )
+            raise RuntimeError("DB_PASSWORD is not configured")
 
         # ====================================================
         # Database Name
         # ====================================================
 
-        self.database = (
-            f"{self.service_name}_db"
-        )
+        self.database = f"{self.service_name}_db"
 
-        logger.info(
-            "Initializing database for service: %s",
-            self.service_name
-        )
+        logger.info("Initializing database for service: %s", self.service_name)
 
-        logger.info(
-            "Database name: %s",
-            self.database
-        )
+        logger.info("Database name: %s", self.database)
 
         # ====================================================
         # Connection Pool
@@ -88,12 +60,10 @@ class Database:
             port=self.port,
             database=self.database,
             user=self.user,
-            password=self.password
+            password=self.password,
         )
 
-        logger.info(
-            "Database connection pool created"
-        )
+        logger.info("Database connection pool created")
 
     # ========================================================
     # Convert ? to PostgreSQL %s
@@ -101,150 +71,81 @@ class Database:
 
     def _prepare_query(self, query):
 
-        return query.replace(
-            "?",
-            "%s"
-        )
+        return query.replace("?", "%s")
 
     # ========================================================
-    # SELECT MANY
+    # EXECUTE ANY QUERY
+    #
+    # Supports:
+    # SELECT
+    # INSERT
+    # UPDATE
+    # DELETE
+    #
+    # SELECT returns:
+    #     list[dict]
+    #
+    # INSERT/UPDATE/DELETE returns:
+    #     affected row count
     # ========================================================
 
-    def fetch_all(
-        self,
-        query,
-        params=None
-    ):
+    def execute(self, query, params=None):
 
         connection = None
         cursor = None
 
         try:
+            # ------------------------------------------------
+            # Prepare query
+            # ------------------------------------------------
 
             query = self._prepare_query(query)
 
-            connection = self.pool.getconn()
+            logger.debug("Executing database query")
 
-            cursor = connection.cursor()
-
-            cursor.execute(
-                query,
-                params or ()
-            )
-
-            columns = [
-                description[0]
-                for description in cursor.description
-            ]
-
-            rows = cursor.fetchall()
-
-            return [
-                dict(zip(columns, row))
-                for row in rows
-            ]
-
-        except Exception:
-
-            logger.exception(
-                "Database fetch_all failed"
-            )
-
-            raise
-
-        finally:
-
-            if cursor:
-                cursor.close()
-
-            if connection:
-                self.pool.putconn(
-                    connection
-                )
-
-    # ========================================================
-    # SELECT ONE
-    # ========================================================
-
-    def fetch_one(
-        self,
-        query,
-        params=None
-    ):
-
-        connection = None
-        cursor = None
-
-        try:
-
-            query = self._prepare_query(query)
+            # ------------------------------------------------
+            # Get connection from pool
+            # ------------------------------------------------
 
             connection = self.pool.getconn()
 
-            cursor = connection.cursor()
-
-            cursor.execute(
-                query,
-                params or ()
-            )
-
-            row = cursor.fetchone()
-
-            if row is None:
-                return None
-
-            columns = [
-                description[0]
-                for description in cursor.description
-            ]
-
-            return dict(
-                zip(columns, row)
-            )
-
-        except Exception:
-
-            logger.exception(
-                "Database fetch_one failed"
-            )
-
-            raise
-
-        finally:
-
-            if cursor:
-                cursor.close()
-
-            if connection:
-                self.pool.putconn(
-                    connection
-                )
-
-    # ========================================================
-    # INSERT / UPDATE / DELETE
-    # ========================================================
-
-    def execute(
-        self,
-        query,
-        params=None
-    ):
-
-        connection = None
-        cursor = None
-
-        try:
-
-            query = self._prepare_query(query)
-
-            connection = self.pool.getconn()
+            # ------------------------------------------------
+            # Create cursor
+            # ------------------------------------------------
 
             cursor = connection.cursor()
 
-            cursor.execute(
-                query,
-                params or ()
-            )
+            # ------------------------------------------------
+            # Execute query
+            # ------------------------------------------------
+
+            cursor.execute(query, params or ())
+
+            # ------------------------------------------------
+            # Check whether query returns rows
+            #
+            # cursor.description is available for
+            # SELECT / RETURNING queries.
+            # ------------------------------------------------
+
+            if cursor.description:
+                columns = [description[0] for description in cursor.description]
+
+                rows = cursor.fetchall()
+
+                result = [dict(zip(columns, row)) for row in rows]
+
+                # SELECT does not modify data,
+                # but committing here keeps the
+                # transaction clean before returning
+                # the connection to the pool.
+                connection.commit()
+
+                return result
+
+            # ------------------------------------------------
+            # INSERT / UPDATE / DELETE
+            # ------------------------------------------------
 
             row_count = cursor.rowcount
 
@@ -253,25 +154,31 @@ class Database:
             return row_count
 
         except Exception:
+            # ------------------------------------------------
+            # Rollback on failure
+            # ------------------------------------------------
 
             if connection:
                 connection.rollback()
 
-            logger.exception(
-                "Database execute failed"
-            )
+            logger.exception("Database query execution failed")
 
             raise
 
         finally:
+            # ------------------------------------------------
+            # Close cursor
+            # ------------------------------------------------
 
             if cursor:
                 cursor.close()
 
+            # ------------------------------------------------
+            # Return connection to pool
+            # ------------------------------------------------
+
             if connection:
-                self.pool.putconn(
-                    connection
-                )
+                self.pool.putconn(connection)
 
     # ========================================================
     # Health Check
@@ -283,45 +190,40 @@ class Database:
         cursor = None
 
         try:
-
             connection = self.pool.getconn()
 
             cursor = connection.cursor()
 
-            cursor.execute(
-                "SELECT 1"
-            )
+            cursor.execute("SELECT 1")
 
             cursor.fetchone()
+
+            connection.commit()
 
             return True
 
         except Exception:
+            if connection:
+                connection.rollback()
 
-            logger.exception(
-                "Database health check failed"
-            )
+            logger.exception("Database health check failed")
 
             return False
 
         finally:
-
             if cursor:
                 cursor.close()
 
             if connection:
-                self.pool.putconn(
-                    connection
-                )
+                self.pool.putconn(connection)
 
     # ========================================================
-    # Close
+    # Close Connection Pool
     # ========================================================
 
     def close(self):
 
-        self.pool.closeall()
+        if self.pool:
+            self.pool.closeall()
 
-        logger.info(
-            "Database connection pool closed"
-        )
+            logger.info("Database connection pool closed")

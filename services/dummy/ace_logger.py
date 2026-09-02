@@ -57,27 +57,16 @@ SERVICE_NAME = os.getenv("SERVICE_NAME", "factoryiq-service")
 
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
 
-LOG_DIR = os.getenv(
-    "LOG_DIR",
-    "/var/log/factoryiq"
-)
+LOG_DIR = os.getenv("LOG_DIR", "/var/log/factoryiq")
 
-LOG_TO_FILE = os.getenv(
-    "LOG_TO_FILE",
-    "true"
-).lower() in ("true", "1", "yes", "on")
+LOG_TO_FILE = os.getenv("LOG_TO_FILE", "true").lower() in ("true", "1", "yes", "on")
 
 
 # ============================================================
 # Constants
 # ============================================================
 
-LOG_FORMAT = (
-    "%(asctime)s | "
-    "%(levelname)s | "
-    "%(name)s | "
-    "%(message)s"
-)
+LOG_FORMAT = "%(asctime)s | %(levelname)s | %(name)s | %(message)s"
 
 DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 
@@ -85,6 +74,7 @@ DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 # ============================================================
 # Convert log level
 # ============================================================
+
 
 def _get_log_level():
     """
@@ -103,6 +93,7 @@ def _get_log_level():
 # ============================================================
 # Create file handler
 # ============================================================
+
 
 def _create_file_handler():
     """
@@ -123,13 +114,9 @@ def _create_file_handler():
     """
 
     try:
-
         log_path = Path(LOG_DIR)
 
-        log_path.mkdir(
-            parents=True,
-            exist_ok=True
-        )
+        log_path.mkdir(parents=True, exist_ok=True)
 
         file_path = log_path / f"{SERVICE_NAME}.log"
 
@@ -137,31 +124,22 @@ def _create_file_handler():
             filename=file_path,
             maxBytes=10 * 1024 * 1024,
             backupCount=5,
-            encoding="utf-8"
+            encoding="utf-8",
         )
 
-        handler.setLevel(
-            _get_log_level()
-        )
+        handler.setLevel(_get_log_level())
 
-        formatter = logging.Formatter(
-            LOG_FORMAT,
-            DATE_FORMAT
-        )
+        formatter = logging.Formatter(LOG_FORMAT, DATE_FORMAT)
 
         handler.setFormatter(formatter)
 
         return handler
 
     except Exception as exc:
-
         # Never allow logging failure to crash
         # the application.
 
-        print(
-            f"WARNING: Could not create log file: {exc}",
-            file=sys.stderr
-        )
+        print(f"WARNING: Could not create log file: {exc}", file=sys.stderr)
 
         return None
 
@@ -170,6 +148,7 @@ def _create_file_handler():
 # Create console handler
 # ============================================================
 
+
 def _create_console_handler():
     """
     Create stdout handler.
@@ -177,18 +156,11 @@ def _create_console_handler():
     Docker captures stdout/stderr automatically.
     """
 
-    handler = logging.StreamHandler(
-        sys.stdout
-    )
+    handler = logging.StreamHandler(sys.stdout)
 
-    handler.setLevel(
-        _get_log_level()
-    )
+    handler.setLevel(_get_log_level())
 
-    formatter = logging.Formatter(
-        LOG_FORMAT,
-        DATE_FORMAT
-    )
+    formatter = logging.Formatter(LOG_FORMAT, DATE_FORMAT)
 
     handler.setFormatter(formatter)
 
@@ -198,6 +170,7 @@ def _create_console_handler():
 # ============================================================
 # Logger factory
 # ============================================================
+
 
 def get_logger(name=None):
     """
@@ -214,13 +187,9 @@ def get_logger(name=None):
 
     logger_name = f"{SERVICE_NAME}.{name}"
 
-    logger = logging.getLogger(
-        logger_name
-    )
+    logger = logging.getLogger(logger_name)
 
-    logger.setLevel(
-        _get_log_level()
-    )
+    logger.setLevel(_get_log_level())
 
     logger.propagate = False
 
@@ -234,23 +203,17 @@ def get_logger(name=None):
 
     console_handler = _create_console_handler()
 
-    logger.addHandler(
-        console_handler
-    )
+    logger.addHandler(console_handler)
 
     # --------------------------------------------------------
     # File logging
     # --------------------------------------------------------
 
     if LOG_TO_FILE:
-
         file_handler = _create_file_handler()
 
         if file_handler is not None:
-
-            logger.addHandler(
-                file_handler
-            )
+            logger.addHandler(file_handler)
 
     return logger
 
@@ -266,16 +229,13 @@ logger = get_logger("application")
 # Convenience functions
 # ============================================================
 
+
 def log_info(message, *args, **kwargs):
     """
     Log INFO message.
     """
 
-    logger.info(
-        message,
-        *args,
-        **kwargs
-    )
+    logger.info(message, *args, **kwargs)
 
 
 def log_warning(message, *args, **kwargs):
@@ -283,11 +243,7 @@ def log_warning(message, *args, **kwargs):
     Log WARNING message.
     """
 
-    logger.warning(
-        message,
-        *args,
-        **kwargs
-    )
+    logger.warning(message, *args, **kwargs)
 
 
 def log_error(message, *args, **kwargs):
@@ -295,11 +251,7 @@ def log_error(message, *args, **kwargs):
     Log ERROR message.
     """
 
-    logger.error(
-        message,
-        *args,
-        **kwargs
-    )
+    logger.error(message, *args, **kwargs)
 
 
 def log_exception(message, *args, **kwargs):
@@ -309,11 +261,7 @@ def log_exception(message, *args, **kwargs):
     Use inside except block.
     """
 
-    logger.exception(
-        message,
-        *args,
-        **kwargs
-    )
+    logger.exception(message, *args, **kwargs)
 
 
 def log_debug(message, *args, **kwargs):
@@ -321,50 +269,29 @@ def log_debug(message, *args, **kwargs):
     Log DEBUG message.
     """
 
-    logger.debug(
-        message,
-        *args,
-        **kwargs
-    )
+    logger.debug(message, *args, **kwargs)
 
 
 # ============================================================
 # Application startup information
 # ============================================================
 
+
 def log_startup():
     """
     Log standard service startup information.
     """
 
-    logger.info(
-        "=================================================="
-    )
+    logger.info("==================================================")
 
-    logger.info(
-        "FactoryIQ service starting"
-    )
+    logger.info("FactoryIQ service starting")
 
-    logger.info(
-        "Service: %s",
-        SERVICE_NAME
-    )
+    logger.info("Service: %s", SERVICE_NAME)
 
-    logger.info(
-        "Log Level: %s",
-        LOG_LEVEL
-    )
+    logger.info("Log Level: %s", LOG_LEVEL)
 
-    logger.info(
-        "Log Directory: %s",
-        LOG_DIR
-    )
+    logger.info("Log Directory: %s", LOG_DIR)
 
-    logger.info(
-        "File Logging: %s",
-        LOG_TO_FILE
-    )
+    logger.info("File Logging: %s", LOG_TO_FILE)
 
-    logger.info(
-        "=================================================="
-    )
+    logger.info("==================================================")
