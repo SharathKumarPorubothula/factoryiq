@@ -82,6 +82,7 @@ def login():
         # ====================================================
 
         data = request.get_json(silent=True)
+        logger.info("Login request received: %s", data)
 
         if not data:
             return jsonify({"error": "Request body is required"}), 400
@@ -125,7 +126,11 @@ def login():
             (username,),
         )
 
+        logger.info("User query result: %s", users)
+
         user = users[0] if users else None
+
+        logger.info("User found: %s", user)
 
         # ====================================================
         # 5. User not found

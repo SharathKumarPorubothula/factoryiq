@@ -510,4 +510,4 @@ def health():
 
 if __name__ == "__main__":
     logger.info("Starting FactoryIQ Service Bridge")
-    app.run(host="0.0.0.0", port=5000, debug=False)
+    app.run(host="0.0.0.0", port=5002, debug=False)

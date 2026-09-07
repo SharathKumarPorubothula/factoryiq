@@ -126,14 +126,38 @@ services:
       LOG_TO_FILE: ${LOG_TO_FILE}
       LOG_DIR: ${LOG_DIR}
 
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_USER: postgres
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
 
       JWT_SECRET: ${JWT_SECRET}
       JWT_ALGORITHM: ${JWT_ALGORITHM}
       JWT_EXPIRATION_MINUTES: ${JWT_EXPIRATION_MINUTES}
+
+
+  project:
+    build: ./services/project
+    image: project
+    container_name: project
+    depends_on:
+      - apache_base
+    ports:
+      - "5003:5003"
+    networks:
+      - bridge_network
+    environment:
+      SERVICE_NAME: project
+
+      LOG_LEVEL: ${LOG_LEVEL}
+      LOG_TO_FILE: ${LOG_TO_FILE}
+      LOG_DIR: ${LOG_DIR}
+
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+
 
 networks:
   bridge_network:

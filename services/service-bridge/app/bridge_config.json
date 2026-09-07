@@ -1,13 +1,14 @@
-[
-    {
-        "login":{
-            "service_name":"identity",
-            "PORT":"5001"
-        },
-        "create_user":{
-            "service_name":"identity",
-            "PORT":"5001"
-        }
-
+{
+    "login": {
+        "service_name": "identity",
+        "port": 5001
+    },
+    "create_user": {
+        "service_name": "identity",
+        "port": 5001
+    },
+    "project": {
+        "service_name": "project",
+        "port": 5003
     }
-]
+}
