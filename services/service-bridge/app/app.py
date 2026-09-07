@@ -8,6 +8,7 @@ import redis
 import requests
 
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 
 from ace_logger import get_logger
 
@@ -17,6 +18,19 @@ from ace_logger import get_logger
 # ============================================================
 
 app = Flask(__name__)
+
+CORS(
+    app,
+    resources={
+        r"/api/*": {
+            "origins": ["http://localhost:5173"],
+            "methods": ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+            "allow_headers": ["Content-Type", "Authorization", "X-Trace-ID"],
+        }
+    }
+)
+
+
 logger = get_logger(__name__)
 
 

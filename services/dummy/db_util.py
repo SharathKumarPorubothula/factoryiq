@@ -10,7 +10,7 @@ logger = get_logger(__name__)
 
 
 class Database:
-    def __init__(self):
+    def __init__(self, database=None):
 
         # ====================================================
         # Service
@@ -41,9 +41,29 @@ class Database:
 
         # ====================================================
         # Database Name
+        #
+        # Priority:
+        #
+        # 1. Database name passed to Database()
+        # 2. DB_NAME from environment (.env)
+        #
+        # Examples:
+        #
+        # Database("identity_db")
+        #       -> identity_db
+        #
+        # Database("project_db")
+        #       -> project_db
+        #
+        # Database()
+        # DB_NAME=project_db
+        #       -> project_db
         # ====================================================
 
-        self.database = f"{self.service_name}_db"
+        self.database = database or os.getenv("DB_NAME")
+
+        if not self.database:
+            raise RuntimeError("DB_NAME is not configured")
 
         logger.info("Initializing database for service: %s", self.service_name)
 
@@ -135,10 +155,10 @@ class Database:
 
                 result = [dict(zip(columns, row)) for row in rows]
 
-                # SELECT does not modify data,
-                # but committing here keeps the
-                # transaction clean before returning
-                # the connection to the pool.
+                # ------------------------------------------------
+                # Commit transaction
+                # ------------------------------------------------
+
                 connection.commit()
 
                 return result

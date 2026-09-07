@@ -86,6 +86,7 @@ COPY . /app/
 
 RUN pip install --no-cache-dir \
     Flask \
+    flask-cors \
     Flask-SQLAlchemy \
     psycopg2-binary \
     redis \

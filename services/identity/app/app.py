@@ -24,7 +24,7 @@ logger = get_logger(__name__)
 # Database
 # ============================================================
 
-db = Database()
+db = Database("identity_db")
 
 
 # ============================================================
@@ -294,7 +294,6 @@ def login():
 
 @app.route("/create_user", methods=["POST"])
 def create_user():
-
     try:
         # ====================================================
         # 1. Read request body

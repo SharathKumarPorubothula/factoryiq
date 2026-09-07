@@ -1,0 +1,488 @@
+* {
+  box-sizing: border-box;
+}
+
+.projects-page {
+  min-height: 100vh;
+  background: #f5f7fa;
+  padding: 30px 40px;
+  font-family: Arial, Helvetica, sans-serif;
+  color: #1f2937;
+}
+
+/* ============================================================
+   HEADER
+============================================================ */
+
+.projects-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+
+  padding: 20px 22px;
+
+  background: white;
+
+  border: 1px solid #e5e7eb;
+  border-bottom: none;
+
+  border-radius: 9px 9px 0 0;
+}
+
+.projects-header h1 {
+  margin: 0;
+
+  font-size: 21px;
+  font-weight: 600;
+}
+
+.projects-header p {
+  margin: 5px 0 0;
+
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.create-project-btn {
+  padding: 9px 16px;
+
+  background: #2563eb;
+  color: white;
+
+  border: none;
+  border-radius: 6px;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.create-project-btn:hover {
+  background: #1d4ed8;
+}
+
+/* ============================================================
+   SEARCH
+============================================================ */
+
+.search-section {
+  background: white;
+
+  border-left: 1px solid #e5e7eb;
+  border-right: 1px solid #e5e7eb;
+
+  padding: 15px 22px;
+}
+
+.project-search {
+  width: 100%;
+
+  padding: 11px 13px;
+
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+
+  font-size: 13px;
+
+  outline: none;
+}
+
+.project-search:focus {
+  border-color: #2563eb;
+}
+
+/* ============================================================
+   FILTERS
+============================================================ */
+
+.filter-section {
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+
+  background: white;
+
+  padding: 0 22px 15px;
+
+  border-left: 1px solid #e5e7eb;
+  border-right: 1px solid #e5e7eb;
+}
+
+.filter-section select {
+  padding: 8px 10px;
+
+  background: white;
+
+  border: 1px solid #d1d5db;
+  border-radius: 5px;
+
+  color: #374151;
+
+  font-size: 12px;
+
+  cursor: pointer;
+
+  outline: none;
+}
+
+.filter-section select:hover {
+  border-color: #9ca3af;
+}
+
+.clear-filter-btn {
+  padding: 8px 12px;
+
+  background: #f3f4f6;
+
+  border: 1px solid #d1d5db;
+
+  border-radius: 5px;
+
+  font-size: 12px;
+
+  cursor: pointer;
+}
+
+/* ============================================================
+   PROJECT CARD
+============================================================ */
+
+.projects-card {
+  background: white;
+
+  border: 1px solid #e5e7eb;
+
+  border-radius: 0 0 9px 9px;
+
+  overflow: hidden;
+}
+
+/* ============================================================
+   TABLE
+============================================================ */
+
+.table-container {
+  width: 100%;
+
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+
+  border-collapse: collapse;
+
+  table-layout: auto;
+}
+
+thead {
+  background: #f9fafb;
+}
+
+th {
+  padding: 12px 14px;
+
+  text-align: left;
+
+  border-top: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e5e7eb;
+
+  color: #6b7280;
+
+  font-size: 11px;
+
+  font-weight: 600;
+
+  text-transform: uppercase;
+
+  white-space: nowrap;
+}
+
+td {
+  padding: 13px 14px;
+
+  border-bottom: 1px solid #eef0f3;
+
+  font-size: 13px;
+
+  white-space: nowrap;
+}
+
+.project-row {
+  cursor: pointer;
+
+  transition: background 0.15s;
+}
+
+.project-row:hover {
+  background: #f8fafc;
+}
+
+/* ============================================================
+   PROJECT
+============================================================ */
+
+.project-code {
+  color: #2563eb;
+
+  font-size: 13px;
+
+  font-weight: 600;
+}
+
+.project-name {
+  font-size: 13px;
+
+  font-weight: 500;
+
+  color: #111827;
+}
+
+/* ============================================================
+   STATUS
+============================================================ */
+
+.status {
+  display: inline-block;
+
+  padding: 4px 9px;
+
+  border-radius: 12px;
+
+  font-size: 10px;
+
+  font-weight: 600;
+
+  text-transform: capitalize;
+}
+
+.status-active {
+  background: #dcfce7;
+
+  color: #15803d;
+}
+
+.status-delayed {
+  background: #fee2e2;
+
+  color: #b91c1c;
+}
+
+.status-planning {
+  background: #fef3c7;
+
+  color: #92400e;
+}
+
+.status-draft {
+  background: #e5e7eb;
+
+  color: #4b5563;
+}
+
+/* ============================================================
+   HEALTH
+============================================================ */
+
+.health {
+  font-size: 11px;
+
+  font-weight: 700;
+}
+
+.health.green {
+  color: #16a34a;
+}
+
+.health.amber {
+  color: #d97706;
+}
+
+.health.red {
+  color: #dc2626;
+}
+
+/* ============================================================
+   NO PROJECTS
+============================================================ */
+
+.no-projects {
+  text-align: center;
+
+  padding: 40px;
+
+  color: #6b7280;
+}
+
+/* ============================================================
+   PAGINATION
+============================================================ */
+
+.pagination {
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  padding: 12px 18px;
+
+  border-top: 1px solid #e5e7eb;
+}
+
+.pagination-info {
+  color: #6b7280;
+
+  font-size: 12px;
+}
+
+.pagination-info strong {
+  color: #374151;
+}
+
+.pagination-controls {
+  display: flex;
+
+  align-items: center;
+
+  gap: 4px;
+}
+
+.page-arrow,
+.page-number {
+  min-width: 28px;
+
+  height: 28px;
+
+  padding: 0 7px;
+
+  border: 1px solid #d1d5db;
+
+  background: white;
+
+  border-radius: 4px;
+
+  font-size: 12px;
+
+  cursor: pointer;
+}
+
+.page-number.active {
+  background: #2563eb;
+
+  border-color: #2563eb;
+
+  color: white;
+
+  font-weight: 600;
+}
+
+.page-arrow:hover:not(:disabled),
+.page-number:hover:not(.active) {
+  background: #f3f4f6;
+}
+
+.page-arrow:disabled {
+  opacity: 0.4;
+
+  cursor: not-allowed;
+}
+
+/* ============================================================
+   LOADING
+============================================================ */
+
+.loading {
+  padding: 80px;
+
+  text-align: center;
+
+  color: #6b7280;
+}
+
+/* ============================================================
+   ERROR
+============================================================ */
+
+.error-box {
+  max-width: 500px;
+
+  margin: 100px auto;
+
+  padding: 30px;
+
+  background: white;
+
+  border: 1px solid #fecaca;
+
+  border-radius: 10px;
+
+  text-align: center;
+}
+
+.error-box h3 {
+  color: #b91c1c;
+}
+
+.error-box p {
+  color: #6b7280;
+}
+
+.error-box button {
+  margin-top: 10px;
+
+  padding: 9px 18px;
+
+  border: none;
+
+  border-radius: 6px;
+
+  background: #2563eb;
+
+  color: white;
+
+  cursor: pointer;
+}
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+
+@media (max-width: 1100px) {
+
+  .projects-page {
+    padding: 20px;
+  }
+
+  .filter-section {
+    flex-wrap: wrap;
+  }
+
+}
+
+@media (max-width: 600px) {
+
+  .projects-page {
+    padding: 10px;
+  }
+
+  .projects-header {
+    flex-direction: column;
+
+    gap: 15px;
+  }
+
+  .create-project-btn {
+    width: 100%;
+  }
+
+  .pagination {
+    flex-direction: column;
+
+    gap: 12px;
+  }
+
+}
